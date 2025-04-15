@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body style="background-color: #FFB6C1; color: #FF69B4; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <h1 style="color: #FF69B4; text-align: center;">Login</h1>
+        <form method="post" style="color: #FF69B4;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" style="background-color: #FF69B4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; display: block; margin: 0 auto;">Login</button>
+        </form>
+    </div>
+</body>
+</html>

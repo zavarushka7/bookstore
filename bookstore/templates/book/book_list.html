@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book List</title>
+</head>
+<body style="background-color: #FFB6C1; color: #FF69B4; font-family: Arial, sans-serif;">
+    <h1 style="color: #FF69B4; text-align: center;">Book List</h1>
+
+    {% if is_authorized %}
+        <p>Logged in as: <span style="font-weight: bold;">{{ user.username }}</span> ({{ user.role }})</p>
+        <a href="{% url 'logout' %}" style="color: #FF69B4; text-decoration: none; margin-right: 10px;">Logout</a>
+        {% if is_admin %}
+            <a href="{% url 'book_create_admin' %}" style="color: #FF69B4; text-decoration: none;">Add New Book (Admin)</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'register' %}" style="color: #FF69B4; text-decoration: none; margin-right: 10px;">Register</a>
+        <a href="{% url 'login' %}" style="color: #FF69B4; text-decoration: none;">Login</a>
+    {% endif %}
+    <br><br>
+
+    {% for book in books %}
+        <div style="border: 1px solid #FF69B4; padding: 10px; margin-bottom: 10px; background-color: #fff;">  <!-- Light background for each book -->
+            <h2 style="color: #FF69B4;">{{ book.title }}</h2>
+            <p>Author: {{ book.author }}</p>
+            <p>Price: {{ book.price }}</p>
+            {% if is_admin %}
+                <a href="{% url 'book_update' book.id %}" style="color: #FF69B4; text-decoration: none; margin-right: 10px;">Edit</a>
+                <a href="{% url 'book_delete' book.id %}" style="color: #FF69B4; text-decoration: none;">Delete</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <div class="pagination" style="margin-top: 20px;">
+        <span class="step-links">
+            {% if books.has_previous %}
+                <a href="?page=1" style="color: #FF69B4; text-decoration: none;">&laquo; first</a>
+                <a href="?page={{ books.previous_page_number }}" style="color: #FF69B4; text-decoration: none; margin: 0 5px;">previous</a>
+            {% endif %}
+
+            <span class="current" style="font-weight: bold; color: #FF69B4;">
+                Page {{ books.number }} of {{ books.paginator.num_pages }}.
+            </span>
+
+            {% if books.has_next %}
+                <a href="?page={{ books.next_page_number }}" style="color: #FF69B4; text-decoration: none; margin: 0 5px;">next</a>
+                <a href="?page={{ books.paginator.num_pages }}" style="color: #FF69B4; text-decoration: none;">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    {% if is_authorized and not is_admin %}
+        <a href="{% url 'book_create' %}" style="color: #FF69B4; text-decoration: none; margin-top: 20px;">Add New Book (User)</a>
+    {% endif %}
+</body>
+</html>
