@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}Личный кабинет{% endblock %}
 {% block content %}
-<h1>Личный кабинет</h1>
-<form method="post" class="mt-4">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" style="background-color: #FF69B4; color: white; border: none; padding: 5px 10px; cursor: pointer;">Сохранить изменения</button>
-</form>
+    <h1>Личный кабинет</h1>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn-custom">Сохранить изменения</button>
+    </form>
 {% endblock %}

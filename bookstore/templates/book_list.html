@@ -3,19 +3,19 @@
 {% block title %}Список книг{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h1 style="color: #FF69B4;">Список книг</h1>
+    <h1>Список книг</h1>
     <div class="row">
         {% for book in books %}
             <div class="col-md-4 mb-3">
-                <div class="card" style="border: 1px solid #FF69B4; background-color: #fff;">
+                <div class="card" style="border: 1px solid #FF69B4;">
                     <div class="card-body">
-                        <h2 class="card-title" style="color: #FF69B4;">{{ book.title }}</h2>
+                        <h2 class="card-title">{{ book.title }}</h2>
                         <p class="card-text">Автор: {{ book.author }}</p>
                         <p class="card-text">Цена: {{ book.price }} руб.</p>
-                        <a href="{% url 'add_to_cart' book.id %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Положить в корзину</a>
+                        <a href="{% url 'add_to_cart' book.id %}" class="btn btn-custom">Положить в корзину</a>
                         {% if is_admin %}
-                            <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning">Редактировать</a>
-                            <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger">Удалить</a>
+                            <a href="{% url 'book_update' book.id %}" class="btn btn-custom">Редактировать</a>
+                            <a href="{% url 'book_delete' book.id %}" class="btn btn-custom">Удалить</a>
                         {% endif %}
                     </div>
                 </div>
@@ -23,7 +23,7 @@
         {% endfor %}
     </div>
     {% if books.has_other_pages %}
-        <nav aria-label="Page navigation" style="margin-top: 20px;">
+        <nav aria-label="Навигация по страницам" style="margin-top: 20px;">
             <ul class="pagination">
                 {% if books.has_previous %}
                     <li class="page-item"><a class="page-link" href="?page=1">« Первая</a></li>

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from .models import Book, User, Cart, CartItem
+from .models import Book, User, Cart, CartItem, Order, OrderItem
 from .forms import BookForm, RegistrationForm, UserUpdateForm, LoginForm
 
 
@@ -50,7 +50,7 @@ def logout_view(request):
 
 
 def book_list(request):
-    books = Book.objects.all()
+    books = Book.objects.all().order_by('id')  # Добавлен order_by для устранения предупреждения
     paginator = Paginator(books, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -154,3 +154,35 @@ def cart_view(request):
     total = sum(item.get_total_price() for item in cart_items)
 
     return render(request, 'cart.html', {'cart_items': cart_items, 'total': total})
+
+
+@login_required
+def create_order(request):
+    cart = Cart.objects.filter(user=request.user).first()
+    if not cart or not cart.items.exists():
+        messages.error(request, "Ваша корзина пуста.")
+        return redirect('cart')
+
+    # Создаём заказ
+    total_price = sum(item.get_total_price() for item in cart.items.all())
+    order = Order.objects.create(user=request.user, total_price=total_price)
+
+    # Переносим элементы корзины в заказ
+    for cart_item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            book=cart_item.book,
+            quantity=cart_item.quantity,
+            price=cart_item.book.price  # Фиксируем цену на момент заказа
+        )
+
+    # Очищаем корзину
+    cart.items.all().delete()
+    messages.success(request, "Заказ успешно оформлен!")
+    return redirect('order_history')
+
+
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'order_history.html', {'orders': orders})

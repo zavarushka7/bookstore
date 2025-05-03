@@ -3,7 +3,7 @@
 {% block title %}Ваша корзина{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h1 style="color: #FF69B4;">Ваша корзина</h1>
+    <h1>Ваша корзина</h1>
     {% if cart_items %}
         <table class="table table-striped">
             <thead>
@@ -27,11 +27,16 @@
                 {% endfor %}
             </tbody>
         </table>
-        <h4 style="color: #FF69B4;">Общая сумма: {{ total }} руб.</h4>
-        <a href="{% url 'book_list' %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Продолжить покупки</a>
+        <h4>Общая сумма: {{ total }} руб.</h4>
+        <a href="{% url 'book_list' %}" class="btn btn-custom">Продолжить покупки</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_order' %}" class="btn btn-custom">Оформить заказ</a>
+        {% else %}
+            <a href="{% url 'login' %}?next={% url 'create_order' %}" class="btn btn-custom">Войти для оформления заказа</a>
+        {% endif %}
     {% else %}
         <p>Ваша корзина пуста.</p>
-        <a href="{% url 'book_list' %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Перейти к книгам</a>
+        <a href="{% url 'book_list' %}" class="btn btn-custom">Перейти к книгам</a>
     {% endif %}
 </div>
 {% endblock %}

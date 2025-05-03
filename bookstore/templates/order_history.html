@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}История заказов{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>История ваших заказов</h1>
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card mb-3" style="border: 1px solid #FF69B4;">
+                <div class="card-body">
+                    <h5 class="card-title">Заказ #{{ order.id }} от {{ order.created_at|date:"d.m.Y H:i" }}</h5>
+                    <p class="card-text">Общая стоимость: {{ order.total_price }} руб.</p>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Книга</th>
+                                <th>Автор</th>
+                                <th>Цена</th>
+                                <th>Количество</th>
+                                <th>Итого</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.book.title }}</td>
+                                    <td>{{ item.book.author }}</td>
+                                    <td>{{ item.price }} руб.</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.get_total_price }} руб.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>У вас пока нет заказов.</p>
+        <a href="{% url 'book_list' %}" class="btn btn-custom">Перейти к книгам</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Book Form</title>
-</head>
-<body style="background-color: #FFB6C1; color: #FF69B4;">
-    <h1 style="color: #FF69B4;">Book Form</h1>
-    <form method="post" style="color: #FF69B4;">
+{% extends 'base.html' %}
+{% block title %}Форма книги{% endblock %}
+{% block content %}
+    <h1>Форма книги</h1>
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" style="background-color: #FF69B4; color: white; border: none; padding: 5px 10px; cursor: pointer;">Save</button>
+        <button type="submit" class="btn-custom">Сохранить</button>
     </form>
-</body>
-</html>
+{% endblock %}
