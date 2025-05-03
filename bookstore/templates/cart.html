@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load mathfilters %}  {# <---- Добавьте эту строку #}
+
+{% block content %}
+    <h1>Ваша корзина</h1>
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    {{ item.book.title }} - {{ item.quantity }} x ${{ item.book.price }} = ${{ item.book.price|mul:item.quantity }}
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Итого: ${{ total }}</p>
+        <a href="{% url 'checkout' %}">Оформить заказ</a>
+    {% else %}
+        <p>Ваша корзина пуста.</p>
+    {% endif %}
+{% endblock %}

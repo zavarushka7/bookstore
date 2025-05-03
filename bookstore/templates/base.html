@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Книжный магазин{% endblock %}</title>
+    <style>
+        body {
+            background-color: #FFB6C1;
+            color: #FF69B4;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        a {
+            color: #FF69B4;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #FF69B4;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'book_list' %}">Книги</a>
+            {% if user.is_authenticated %}
+                <span>Logged in as: <strong>{{ user.username }}</strong> ({{ user.role }})</span>
+                <a href="{% url 'profile' %}">Личный кабинет</a>
+                <a href="{% url 'cart' %}">Корзина</a>  {#  <----  ДОБАВЬТЕ ЭТУ СТРОКУ #}
+                {% if user.role == 'admin' %}
+                    <a href="{% url 'book_create_admin' %}">Add New Book (Admin)</a>
+                {% else %}
+                    <a href="{% url 'book_create' %}">Add New Book (User)</a>
+                {% endif %}
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'register' %}">Register</a>
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
