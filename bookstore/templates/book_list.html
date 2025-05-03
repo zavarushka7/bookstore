@@ -1,32 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Список книг{% endblock %}
 {% block content %}
-<h1>Список книг</h1>
-{% for book in books %}
-    <div style="border: 1px solid #FF69B4; padding: 10px; margin-bottom: 10px; background-color: #fff;">
-        <h2 style="color: #FF69B4;">{{ book.title }}</h2>
-        <p>Author: {{ book.author }}</p>
-        <p>Price: {{ book.price }}</p>
-        <a href="{% url 'add_to_cart' book.id %}" style="color: #FF69B4; text-decoration: none; margin-right: 10px;">Положить в корзину</a>
-        {% if is_admin %}
-            <a href="{% url 'book_update' book.id %}">Edit</a>
-            <a href="{% url 'book_delete' book.id %}">Delete</a>
-        {% endif %}
+<div class="container mt-5">
+    <h1 style="color: #FF69B4;">Список книг</h1>
+    <div class="row">
+        {% for book in books %}
+            <div class="col-md-4 mb-3">
+                <div class="card" style="border: 1px solid #FF69B4; background-color: #fff;">
+                    <div class="card-body">
+                        <h2 class="card-title" style="color: #FF69B4;">{{ book.title }}</h2>
+                        <p class="card-text">Автор: {{ book.author }}</p>
+                        <p class="card-text">Цена: {{ book.price }} руб.</p>
+                        <a href="{% url 'add_to_cart' book.id %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Положить в корзину</a>
+                        {% if is_admin %}
+                            <a href="{% url 'book_update' book.id %}" class="btn btn-outline-warning">Редактировать</a>
+                            <a href="{% url 'book_delete' book.id %}" class="btn btn-outline-danger">Удалить</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-{% endfor %}
-<div class="pagination" style="margin-top: 20px;">
-    <span class="step-links">
-        {% if books.has_previous %}
-            <a href="?page=1">« first</a>
-            <a href="?page={{ books.previous_page_number }}" style="margin: 0 5px;">previous</a>
-        {% endif %}
-        <span class="current" style="font-weight: bold;">
-            Page {{ books.number }} of {{ books.paginator.num_pages }}.
-        </span>
-        {% if books.has_next %}
-            <a href="?page={{ books.next_page_number }}" style="margin: 0 5px;">next</a>
-            <a href="?page={{ books.paginator.num_pages }}">last »</a>
-        {% endif %}
-    </span>
+    {% if books.has_other_pages %}
+        <nav aria-label="Page navigation" style="margin-top: 20px;">
+            <ul class="pagination">
+                {% if books.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">« Первая</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ books.previous_page_number }}">Предыдущая</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Страница {{ books.number }} из {{ books.paginator.num_pages }}</span></li>
+                {% if books.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ books.next_page_number }}">Следующая</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ books.paginator.num_pages }}">Последняя »</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
 </div>
 {% endblock %}

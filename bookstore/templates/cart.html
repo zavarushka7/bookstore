@@ -1,20 +1,37 @@
 {% extends 'base.html' %}
-{% load mathfilters %}  {# <---- Добавьте эту строку #}
-
+{% load static %}
+{% block title %}Ваша корзина{% endblock %}
 {% block content %}
-    <h1>Ваша корзина</h1>
-
+<div class="container mt-5">
+    <h1 style="color: #FF69B4;">Ваша корзина</h1>
     {% if cart_items %}
-        <ul>
-            {% for item in cart_items %}
-                <li>
-                    {{ item.book.title }} - {{ item.quantity }} x ${{ item.book.price }} = ${{ item.book.price|mul:item.quantity }}
-                </li>
-            {% endfor %}
-        </ul>
-        <p>Итого: ${{ total }}</p>
-        <a href="{% url 'checkout' %}">Оформить заказ</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Книга</th>
+                    <th>Автор</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Итого</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.book.title }}</td>
+                        <td>{{ item.book.author }}</td>
+                        <td>{{ item.book.price }} руб.</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.get_total_price }} руб.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h4 style="color: #FF69B4;">Общая сумма: {{ total }} руб.</h4>
+        <a href="{% url 'book_list' %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Продолжить покупки</a>
     {% else %}
         <p>Ваша корзина пуста.</p>
+        <a href="{% url 'book_list' %}" class="btn btn-outline" style="color: #FF69B4; border-color: #FF69B4;">Перейти к книгам</a>
     {% endif %}
+</div>
 {% endblock %}

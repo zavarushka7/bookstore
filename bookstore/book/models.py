@@ -26,11 +26,12 @@ class User(AbstractUser):
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='cart')
+    session_id = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Cart of {self.user.username}"
+        return f"Cart {'for ' + str(self.user) if self.user else 'session ' + self.session_id}"
 
 
 class CartItem(models.Model):
@@ -40,3 +41,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.book.title} in cart"
+
+    def get_total_price(self):
+        return self.quantity * self.book.price

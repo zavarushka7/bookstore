@@ -52,6 +52,6 @@ class UserUpdateForm(forms.ModelForm):
         return user
 
 
-class LoginForm(forms.Form):  # <---  ДОБАВЬТЕ ЭТО
+class LoginForm(forms.Form):
     username = forms.CharField(label="Имя пользователя", max_length=150)
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
