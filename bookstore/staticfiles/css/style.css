@@ -1,0 +1,107 @@
+body {
+    background-color: #FFB6C1;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    background-color: #F6768E;
+}
+
+.navbar-brand, .nav-link {
+    color: #3caa3c !important;
+}
+
+.navbar-brand:hover, .nav-link:hover {
+    color: #1D7A1D !important;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #F6768E;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #FF69B4;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-custom {
+    background-color: #98FF98;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-custom:hover {
+    background-color: #7CFC00;
+    color: #fff;
+}
+
+.btn-outline-custom {
+    color: #98FF98;
+    border-color: #98FF98;
+}
+
+.btn-outline-custom:hover {
+    background-color: #98FF98;
+    color: #fff;
+}
+
+.table {
+    background-color: #fff;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #F9F9F9;
+}
+
+.alert {
+    border: 1px solid #CCFFCC;
+    color: #333;
+}
+
+.pagination .page-link {
+    color: #98FF98;
+}
+
+.pagination .page-link:hover {
+    background-color: #98FF98;
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #ccc;
+}
+
+form p {
+    color: #333;
+}
+
+input, select, textarea {
+    border: 1px solid #98FF98 !important;
+    border-radius: 4px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #7CFC00 !important;
+    box-shadow: 0 0 5px rgba(124, 252, 0, 0.3);
+}
+
+.error-message {
+    color: #FF69B4;
+    font-size: 0.9em;
+    margin-top: 5px;
+}

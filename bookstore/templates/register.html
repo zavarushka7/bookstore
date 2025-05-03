@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
     <div class="container mt-5">
         <h1>Регистрация</h1>
-        <form method="post">
+        <form method="post" id="register-form">
             {% csrf_token %}
             {{ form.as_p }}
+            <div id="email-error" class="error-message"></div>
+            <div id="password-error" class="error-message"></div>
             <button type="submit" class="btn-custom">Зарегистрироваться</button>
         </form>
     </div>
+    <script src="{% static 'js/register.js' %}"></script>
 {% endblock %}

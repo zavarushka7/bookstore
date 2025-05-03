@@ -4,6 +4,19 @@
 {% block content %}
 <div class="container mt-5">
     <h1>Список книг</h1>
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="author" class="form-control" placeholder="Фильтр по автору" value="{{ request.GET.author }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-custom">Фильтровать</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'book_list' %}" class="btn btn-outline-custom">Сбросить</a>
+            </div>
+        </div>
+    </form>
     <div class="row">
         {% for book in books %}
             <div class="col-md-4 mb-3">
@@ -26,13 +39,13 @@
         <nav aria-label="Навигация по страницам" style="margin-top: 20px;">
             <ul class="pagination">
                 {% if books.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page=1">« Первая</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ books.previous_page_number }}">Предыдущая</a></li>
+                    <li class="page-item"><a class="page-link" href="?page=1{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}">« Первая</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ books.previous_page_number }}{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}">Предыдущая</a></li>
                 {% endif %}
                 <li class="page-item disabled"><span class="page-link">Страница {{ books.number }} из {{ books.paginator.num_pages }}</span></li>
                 {% if books.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ books.next_page_number }}">Следующая</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ books.paginator.num_pages }}">Последняя »</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ books.next_page_number }}{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}">Следующая</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ books.paginator.num_pages }}{% if request.GET.author %}&author={{ request.GET.author }}{% endif %}">Последняя »</a></li>
                 {% endif %}
             </ul>
         </nav>

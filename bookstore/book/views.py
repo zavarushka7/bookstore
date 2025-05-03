@@ -3,8 +3,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.core.cache import cache
+from django.http import JsonResponse
 from .models import Book, User, Cart, CartItem, Order, OrderItem
 from .forms import BookForm, RegistrationForm, UserUpdateForm, LoginForm
+
+
+def check_email(request):
+    email = request.GET.get('email', '')
+    data = {'is_taken': User.objects.filter(email=email).exists()}
+    if data['is_taken']:
+        data['error_message'] = 'Этот email уже зарегистрирован.'
+    return JsonResponse(data)
 
 
 def register(request):
@@ -16,26 +26,45 @@ def register(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(request, username=username, password=password)
             login(request, user)
+            messages.success(request, 'Регистрация прошла успешно!')
             return redirect('book_list')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = RegistrationForm()
     return render(request, 'register.html', {'form': form})
 
 
 def login_view(request):
+    client_ip = request.META.get('REMOTE_ADDR')
+    login_attempts_key = f'login_attempts_{client_ip}'
+    login_attempts = cache.get(login_attempts_key, 0)
+
+    if login_attempts >= 5:
+        messages.error(request, 'Слишком много попыток входа. Попробуйте снова через 10 минут.')
+        return render(request, 'login.html', {'form': LoginForm()})
+
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+                cache.delete(login_attempts_key)
+                messages.success(request, 'Вход выполнен успешно!')
                 next_page = request.GET.get('next')
                 return redirect(next_page) if next_page else redirect('book_list')
             else:
+                login_attempts += 1
+                cache.set(login_attempts_key, login_attempts, timeout=600)
                 messages.error(request, 'Неверное имя пользователя или пароль.')
         else:
+            login_attempts += 1
+            cache.set(login_attempts_key, login_attempts, timeout=600)
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f'{field}: {error}')
@@ -46,11 +75,15 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.success(request, 'Вы успешно вышли из системы.')
     return redirect('book_list')
 
 
 def book_list(request):
-    books = Book.objects.all().order_by('id')  # Добавлен order_by для устранения предупреждения
+    books = Book.objects.all().order_by('id')
+    author_filter = request.GET.get('author')
+    if author_filter:
+        books = books.filter(author__icontains=author_filter)
     paginator = Paginator(books, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -65,7 +98,10 @@ def book_create(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Книга успешно добавлена.')
             return redirect('book_list')
+        else:
+            messages.error(request, 'Ошибка при добавлении книги.')
     else:
         form = BookForm()
     return render(request, 'book_form.html', {'form': form})
@@ -74,12 +110,16 @@ def book_create(request):
 @login_required
 def book_create_admin(request):
     if request.user.role != 'admin':
+        messages.error(request, 'Доступ запрещен.')
         return redirect('book_list')
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Книга успешно добавлена.')
             return redirect('book_list')
+        else:
+            messages.error(request, 'Ошибка при добавлении книги.')
     else:
         form = BookForm()
     return render(request, 'book_form.html', {'form': form})
@@ -88,13 +128,17 @@ def book_create_admin(request):
 @login_required
 def book_update(request, pk):
     if request.user.role != 'admin':
+        messages.error(request, 'Доступ запрещен.')
         return redirect('book_list')
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Книга успешно обновлена.')
             return redirect('book_list')
+        else:
+            messages.error(request, 'Ошибка при обновлении книги.')
     else:
         form = BookForm(instance=book)
     return render(request, 'book_form.html', {'form': form})
@@ -103,10 +147,12 @@ def book_update(request, pk):
 @login_required
 def book_delete(request, pk):
     if request.user.role != 'admin':
+        messages.error(request, 'Доступ запрещен.')
         return redirect('book_list')
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         book.delete()
+        messages.success(request, 'Книга успешно удалена.')
         return redirect('book_list')
     return render(request, 'book_confirm_delete.html', {'book': book})
 
@@ -119,6 +165,10 @@ def profile(request):
             form.save()
             messages.success(request, 'Профиль успешно обновлён.')
             return redirect('profile')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = UserUpdateForm(instance=request.user)
     return render(request, 'profile.html', {'form': form})
@@ -163,20 +213,17 @@ def create_order(request):
         messages.error(request, "Ваша корзина пуста.")
         return redirect('cart')
 
-    # Создаём заказ
     total_price = sum(item.get_total_price() for item in cart.items.all())
     order = Order.objects.create(user=request.user, total_price=total_price)
 
-    # Переносим элементы корзины в заказ
     for cart_item in cart.items.all():
         OrderItem.objects.create(
             order=order,
             book=cart_item.book,
             quantity=cart_item.quantity,
-            price=cart_item.book.price  # Фиксируем цену на момент заказа
+            price=cart_item.book.price
         )
 
-    # Очищаем корзину
     cart.items.all().delete()
     messages.success(request, "Заказ успешно оформлен!")
     return redirect('order_history')
